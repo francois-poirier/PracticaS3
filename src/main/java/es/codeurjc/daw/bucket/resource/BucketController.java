@@ -33,43 +33,45 @@ public class BucketController {
 		this.bucketService = bucketService;
 	}
 
-	@GetMapping(path = "​/api/buckets/")
+	@GetMapping(value = "/api/buckets")
 	public ResponseEntity<List<String>> listBuckets() {
 		return ResponseEntity.ok().body(bucketService.listBuckets());
 	}
 	
-	@GetMapping(path = "​/api/buckets/{bucketName}")
-    public ResponseEntity<BucketDto> getBucket(@PathVariable String bucketName) {
+	@GetMapping(value = "/api/buckets/{bucketName}")
+    public ResponseEntity<BucketDto> getBucket(@PathVariable("bucketName") String bucketName) {
 		return ResponseEntity.ok().body(bucketService.getBucket(bucketName));
 	}
 	
-	@PostMapping(path = "​/api/buckets/{bucketName}")
-	public ResponseEntity<BucketDto> createBucket(@PathVariable String bucketName) {
+
+	@PostMapping(value = "​/api/buckets/{bucketName}")
+	public ResponseEntity<BucketDto> createBucket(@PathVariable("bucketName") String bucketName) {
 		return new ResponseEntity<>(bucketService.createBucket(bucketName), HttpStatus.CREATED);
 	}
 	
-	@DeleteMapping(path = "​/api/buckets/{bucketName}")
-	public ResponseEntity<Void> deleteBucket(@PathVariable String bucketName) {
+	
+	@DeleteMapping(value = "​/api/buckets/{bucketName}")
+	public ResponseEntity<Void> deleteBucket(@PathVariable("bucketName") String bucketName) {
 		bucketService.deleteBucket(bucketName);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 	
-	@DeleteMapping(path = "​/api/buckets/{bucketName}/{objectName}")
-	public ResponseEntity<Void> deleteObject(@PathVariable String bucketName,@PathVariable String objectName) {
+	@DeleteMapping(value = "​/api/buckets/{bucketName}/{objectName}")
+	public ResponseEntity<Void> deleteObject(@PathVariable("bucketName") String bucketName,@PathVariable("objectName") String objectName) {
 		bucketService.deleteObject(bucketName,objectName);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
-	@PostMapping(path = "​/api/buckets/{bucketName}/uploadObject")
-	public ResponseEntity<String> uploadFile(@PathVariable String bucketName,@RequestPart("file") MultipartFile multipartFile, @RequestPart("isPublic") Boolean isPublic) throws IOException {
+	@PostMapping(value = "​/api/buckets/{bucketName}/uploadObject")
+	public ResponseEntity<String> uploadFile(@PathVariable("bucketName") String bucketName,@RequestPart("file") MultipartFile multipartFile, @RequestPart("isPublic") Boolean isPublic) throws IOException {
 		String fileName = multipartFile.getOriginalFilename();
 		File file = new File("java.io.tmpdir"+"/"+fileName);
 		multipartFile.transferTo(file);
 		return new ResponseEntity<>(bucketService.uploadFile(bucketName,fileName,file,isPublic), HttpStatus.CREATED);              
 	}
 	
-	@PostMapping(path = "​/api/buckets/{bucketName}/copyObject")
-	public ResponseEntity<String> copyObject(@PathVariable String bucketName, @RequestParam("sourceKey") String sourceKey, @RequestParam("destinationBucketName") String destinationBucketName,
+	@PostMapping(value = "​/api/buckets/{bucketName}/copyObject")
+	public ResponseEntity<String> copyObject(@PathVariable("bucketName") String bucketName, @RequestParam("sourceKey") String sourceKey, @RequestParam("destinationBucketName") String destinationBucketName,
 			@RequestParam("destinationKey") String destinationKey) {
 		return new ResponseEntity<>(bucketService.copyObject(bucketName, sourceKey, destinationBucketName, destinationKey),HttpStatus.CREATED);
 	}
