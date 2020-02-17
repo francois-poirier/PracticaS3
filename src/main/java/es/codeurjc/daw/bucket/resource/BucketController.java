@@ -9,10 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +22,7 @@ import es.codeurjc.daw.bucket.dto.ObjectDto;
 import es.codeurjc.daw.bucket.service.BucketService;
 
 @RestController
+@RequestMapping(value="/api/buckets")
 public class BucketController {
 
 	Logger logger = LoggerFactory.getLogger(BucketController.class);
@@ -34,48 +34,48 @@ public class BucketController {
 		this.bucketService = bucketService;
 	}
 
-	@GetMapping(value = "/api/buckets")
+	@RequestMapping(value = "/", produces = "application/json", method=RequestMethod.GET)
 	public ResponseEntity<List<String>> listBuckets() {
 		return ResponseEntity.ok().body(bucketService.listBuckets());
 	}
 	
-	@GetMapping(value = "/api/buckets/{bucketName}")
+	@RequestMapping(value = "/{bucketName}", produces = "application/json", method=RequestMethod.GET)
     public ResponseEntity<BucketDto> getBucket(@PathVariable("bucketName") String bucketName) {
 		return ResponseEntity.ok().body(bucketService.getBucket(bucketName));
 	}
 	
-	@GetMapping(value = "/api/buckets/{bucketName}/objects")
+	@RequestMapping(value = "/{bucketName}/objects", produces = "application/json", method=RequestMethod.GET)
     public ResponseEntity<List<ObjectDto>> getObjects(@PathVariable("bucketName") String bucketName) {
 		return ResponseEntity.ok().body(bucketService.listObjects(bucketName));
 	}
 	
-	@PostMapping(value = "​/api/buckets/{bucketName}")
+	@RequestMapping(value = "/{bucketName}", produces = "application/json", method=RequestMethod.POST)
 	public ResponseEntity<BucketDto> createBucket(@PathVariable("bucketName") String bucketName) {
 		return new ResponseEntity<>(bucketService.createBucket(bucketName), HttpStatus.CREATED);
 	}
 	
 	
-	@DeleteMapping(value = "​/api/buckets/{bucketName}")
+	@RequestMapping(value = "/{bucketName}", produces = "application/json", method=RequestMethod.DELETE)
 	public ResponseEntity<Void> deleteBucket(@PathVariable("bucketName") String bucketName) {
 		bucketService.deleteBucket(bucketName);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 	
-	@DeleteMapping(value = "​/api/buckets/{bucketName}/{objectName}")
+	@RequestMapping(value = "/{bucketName}/{objectName}", produces = "application/json", method=RequestMethod.DELETE)
 	public ResponseEntity<Void> deleteObject(@PathVariable("bucketName") String bucketName,@PathVariable("objectName") String objectName) {
 		bucketService.deleteObject(bucketName,objectName);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
-	@PostMapping(value = "​/api/buckets/{bucketName}/uploadObject")
-	public ResponseEntity<String> uploadFile(@PathVariable("bucketName") String bucketName,@RequestPart("file") MultipartFile multipartFile, @RequestPart("isPublic") Boolean isPublic) throws IOException {
+	@RequestMapping(value = "/{bucketName}/uploadObject", produces = "application/json", method=RequestMethod.POST)
+	public ResponseEntity<String> uploadFile(@PathVariable("bucketName") String bucketName,@RequestPart("file") MultipartFile multipartFile/*, @RequestPart("isPublic") Boolean isPublic*/) throws IOException {
 		String fileName = multipartFile.getOriginalFilename();
 		File file = new File("java.io.tmpdir"+"/"+fileName);
 		multipartFile.transferTo(file);
-		return new ResponseEntity<>(bucketService.uploadFile(bucketName,fileName,file,isPublic), HttpStatus.CREATED);              
+		return new ResponseEntity<>(bucketService.uploadFile(bucketName,fileName,file,Boolean.TRUE), HttpStatus.CREATED);              
 	}
 	
-	@PostMapping(value = "​/api/buckets/{bucketName}/copyObject")
+	@RequestMapping(value = "/{bucketName}/copyObject", produces = "application/json", method=RequestMethod.POST)
 	public ResponseEntity<String> copyObject(@PathVariable("bucketName") String bucketName, @RequestParam("sourceKey") String sourceKey, @RequestParam("destinationBucketName") String destinationBucketName,
 			@RequestParam("destinationKey") String destinationKey) {
 		return new ResponseEntity<>(bucketService.copyObject(bucketName, sourceKey, destinationBucketName, destinationKey),HttpStatus.CREATED);

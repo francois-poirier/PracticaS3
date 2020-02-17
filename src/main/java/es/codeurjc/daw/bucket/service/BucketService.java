@@ -44,6 +44,7 @@ public class BucketService {
 	}
 
 	public BucketDto createBucket(String bucketName) {
+		
 		return toBucketDto(s3client.createBucket(bucketName));
 	}
 
@@ -98,12 +99,12 @@ public class BucketService {
 	}
 
 	private BucketDto toBucketDto(Bucket bucket) {
-		return new BucketDto.Builder().withName(bucket.getName()).withCreationDate(bucket.getCreationDate())
-				.withOwnerName(bucket.getOwner().getDisplayName()).build();
+		return new BucketDto.Builder().withName(bucket.getName()!=null?bucket.getName():null).withCreationDate(bucket.getCreationDate()!=null?bucket.getCreationDate():null).withOwnerName(bucket.getOwner()!=null?bucket.getOwner().getDisplayName():null)
+				.build();
 	}
 	
 	private ObjectDto toObjectDto(S3ObjectSummary s) {
-		return new ObjectDto.Builder().withETag(s.getETag()).withLastModified(s.getLastModified()).withSize(s.getSize()).build();
+		return new ObjectDto.Builder().withETag(s!=null?s.getETag():null).withLastModified(s!=null?s.getLastModified():null).withSize(s!=null?s.getSize():0).build();
 	}
 	
 	private void checkSource(String bucketName, String objectKey) {
