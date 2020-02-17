@@ -33,7 +33,7 @@ public class BucketController {
 		this.bucketService = bucketService;
 	}
 
-	@RequestMapping(value = "/", produces = "application/json", method=RequestMethod.GET)
+	@RequestMapping(value = "", produces = "application/json", method=RequestMethod.GET)
 	public ResponseEntity<List<String>> listBuckets() {
 		return ResponseEntity.ok().body(bucketService.listBuckets());
 	}
