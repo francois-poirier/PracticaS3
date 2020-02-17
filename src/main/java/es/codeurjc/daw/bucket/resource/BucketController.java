@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -68,11 +67,11 @@ public class BucketController {
 	}
 
 	@RequestMapping(value = "/{bucketName}/uploadObject", produces = "application/json", method=RequestMethod.POST)
-	public ResponseEntity<String> uploadFile(@PathVariable("bucketName") String bucketName,@RequestPart("file") MultipartFile multipartFile/*, @RequestPart("isPublic") Boolean isPublic*/) throws IOException {
+	public ResponseEntity<String> uploadFile(@PathVariable("bucketName") String bucketName,@RequestParam("file") MultipartFile multipartFile, @RequestParam("isPublic") Boolean isPublic) throws IOException {
 		String fileName = multipartFile.getOriginalFilename();
 		File file = new File("java.io.tmpdir"+"/"+fileName);
 		multipartFile.transferTo(file);
-		return new ResponseEntity<>(bucketService.uploadFile(bucketName,fileName,file,Boolean.TRUE), HttpStatus.CREATED);              
+		return new ResponseEntity<>(bucketService.uploadFile(bucketName,fileName,file,isPublic), HttpStatus.CREATED);              
 	}
 	
 	@RequestMapping(value = "/{bucketName}/copyObject", produces = "application/json", method=RequestMethod.POST)
