@@ -14,9 +14,10 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GetObjectMetadataRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 import es.codeurjc.daw.bucket.dto.BucketDto;
+import es.codeurjc.daw.bucket.dto.ObjectDto;
 import es.codeurjc.daw.bucket.exception.EntityNotFoundException;
 
 @Service
@@ -72,15 +73,13 @@ public class BucketService {
 		return s3client.putObject(bucketName,key,file).getETag();
 	}
 
-	public ObjectListing listObjects(String bucketName) {
-		return s3client.listObjects(bucketName);
+	public List<ObjectDto> listObjects(String bucketName) {
+		if (!bucketExist(bucketName)) {
+			throw new EntityNotFoundException(BUCKET + bucketName + NOT_FOUND);
+		}
+		ObjectListing objectListing = s3client.listObjects(bucketName);
+		return objectListing.getObjectSummaries().stream().map(os-> toObjectDto(os)).collect(Collectors.toList());
 	}
-
-	public S3Object getObject(String bucketName, String objectKey) {
-		checkSource(bucketName, objectKey);
-		return s3client.getObject(bucketName, objectKey);
-	}
-
 
 	public String copyObject(String sourceBucketName, String sourceKey, String destinationBucketName, String destinationKey) {
 		
@@ -101,6 +100,10 @@ public class BucketService {
 	private BucketDto toBucketDto(Bucket bucket) {
 		return new BucketDto.Builder().withName(bucket.getName()).withCreationDate(bucket.getCreationDate())
 				.withOwnerName(bucket.getOwner().getDisplayName()).build();
+	}
+	
+	private ObjectDto toObjectDto(S3ObjectSummary s) {
+		return new ObjectDto.Builder().withETag(s.getETag()).withLastModified(s.getLastModified()).withSize(s.getSize()).build();
 	}
 	
 	private void checkSource(String bucketName, String objectKey) {

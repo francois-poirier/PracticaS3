@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.codeurjc.daw.bucket.dto.BucketDto;
+import es.codeurjc.daw.bucket.dto.ObjectDto;
 import es.codeurjc.daw.bucket.service.BucketService;
 
 @RestController
@@ -43,7 +44,11 @@ public class BucketController {
 		return ResponseEntity.ok().body(bucketService.getBucket(bucketName));
 	}
 	
-
+	@GetMapping(value = "/api/buckets/{bucketName}/objects")
+    public ResponseEntity<List<ObjectDto>> getObjects(@PathVariable("bucketName") String bucketName) {
+		return ResponseEntity.ok().body(bucketService.listObjects(bucketName));
+	}
+	
 	@PostMapping(value = "​/api/buckets/{bucketName}")
 	public ResponseEntity<BucketDto> createBucket(@PathVariable("bucketName") String bucketName) {
 		return new ResponseEntity<>(bucketService.createBucket(bucketName), HttpStatus.CREATED);
